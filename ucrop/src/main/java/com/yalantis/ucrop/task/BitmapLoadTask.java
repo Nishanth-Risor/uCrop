@@ -3,6 +3,8 @@ package com.yalantis.ucrop.task;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,11 +13,13 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.yalantis.ucrop.UCropActivity;
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.model.ExifInfo;
 import com.yalantis.ucrop.util.BitmapLoadUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,11 +51,31 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
     private final BitmapLoadCallback mBitmapLoadCallback;
 
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
+    }
+
+
     public static class BitmapWorkerResult {
 
         Bitmap mBitmapResult;
         ExifInfo mExifInfo;
         Exception mBitmapWorkerException;
+
+
 
         public BitmapWorkerResult(@NonNull Bitmap bitmapResult, @NonNull ExifInfo exifInfo) {
             mBitmapResult = bitmapResult;
@@ -118,6 +142,157 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
                 return new BitmapWorkerResult(new IllegalArgumentException("Bitmap could not be decoded from the Uri: [" + mInputUri + "]", e));
             }
         }
+
+
+        Long time=System.currentTimeMillis();
+        Log.d("ishat0", time.toString());
+
+
+
+        if(decodeSampledBitmap!=null)
+        {
+
+
+
+            int rwidth;
+            int rheight;
+            int y=decodeSampledBitmap.getWidth();
+            int x=decodeSampledBitmap.getHeight();
+            float aspectrxy=(float)x/y;
+            float aspectryx=(float)y/x;
+
+
+            int mrh=1600, mrw=900;
+
+            if(x<=mrh && y>mrw)
+            {
+                rwidth=mrw;
+                rheight= (int) (aspectrxy*rwidth);
+            }
+            else if(x<=mrh && y<=mrw)
+            {
+
+                float aspectratioframe=(float) mrw/mrh;
+
+                float aspectratioimage=(float ) y/x;
+
+                if(aspectratioframe>aspectratioimage)
+                {
+                    rheight = mrh;
+                    rwidth = (int) (aspectryx * rheight);
+
+
+                }
+                else
+                {rwidth = mrw;
+                    rheight = (int) (aspectrxy * rwidth);
+
+                }
+            }
+            else if(x>mrh && y<=mrw)
+            {
+                rheight=mrh;
+                rwidth=(int)(aspectryx*rheight);
+
+            }
+            else
+            {
+                if(mrw<=mrh)
+                {
+                    rwidth=mrw;
+                    rheight=(int)(aspectrxy*rwidth);
+                }
+                else
+                {
+                    rheight=mrh;
+                    rwidth=(int)(aspectryx*rheight);
+                }
+
+            }
+
+
+
+
+
+            Bitmap finalbitmap= getResizedBitmap(decodeSampledBitmap, rwidth, rheight);
+            Bitmap reqbitmap = Bitmap.createBitmap(mrw, mrh, finalbitmap.getConfig());
+
+            // Instantiate a canvas and prepare it to paint to the new bitmap
+            Canvas canvas = new Canvas(reqbitmap);
+
+            // Paint it white (or whatever color you want)
+            canvas.drawColor(Color.RED);
+
+            // Draw the old bitmap ontop of the new white one
+            //int minw = Math.min(mRequiredWidth, decodeSampledBitmap.getWidth()), minh = Math.min(mRequiredHeight, decodeSampledBitmap.getHeight());
+
+            int spcw=(mrw-rwidth+1)/2;
+            int spch=(mrh-rheight+1)/2;
+            canvas.drawBitmap(finalbitmap, spcw, spch, null);
+
+            /*
+            int minw = Math.min(mRequiredWidth, decodeSampledBitmap.getWidth()), minh = Math.min(mRequiredHeight, decodeSampledBitmap.getHeight());
+
+            int spcw=(mRequiredWidth-minw+1)/2;
+            int spch=(mRequiredHeight-minh+1)/2;
+
+            Bitmap reqbitmap= Bitmap.createBitmap(mRequiredWidth, mRequiredHeight, Bitmap.Config.ARGB_8888);
+
+
+            int numPixels = finalbitmap.getWidth()* finalbitmap.getHeight();
+            int[] pixels = new int[numPixels];
+
+            finalbitmap.getPixels(pixels, 0, finalbitmap.getWidth(), 0, 0, finalbitmap.getWidth(),finalbitmap.getHeight());
+
+            reqbitmap.setPixels(pixels, 0,finalbitmap.getWidth(), spcw, spch, finalbitmap.getWidth(), finalbitmap.getHeight());
+            for(int i=0;i<mRequiredWidth;i++)
+            {
+                for(int j=0;j<mRequiredHeight;j++)
+                {
+                    if(reqbitmap.getPixel(i, j)==0)
+
+                    {reqbitmap.setPixel(i, j, Color.RED);
+
+                    }
+
+
+                }
+            }
+
+
+
+            decodeSampledBitmap=reqbitmap;
+
+             */
+
+            decodeSampledBitmap=reqbitmap;
+
+            File file = new File(mInputUri.getPath());
+            OutputStream fOut = null;
+            try {
+                fOut = new FileOutputStream(file);
+
+                decodeSampledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 100% compression rate
+                fOut.flush();
+                fOut.close(); // do not forget to close the stream
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+
+
+        }
+
+         time=System.currentTimeMillis();
+        Log.d("ishat1", time.toString());
+
+
+
+
 
         if (decodeSampledBitmap == null) {
             return new BitmapWorkerResult(new IllegalArgumentException("Bitmap could not be decoded from the Uri: [" + mInputUri + "]"));

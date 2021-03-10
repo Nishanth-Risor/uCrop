@@ -36,6 +36,7 @@ import com.yalantis.ucrop.view.UCropView;
 import com.yalantis.ucrop.view.widget.AspectRatioTextView;
 import com.yalantis.ucrop.view.widget.HorizontalProgressWheelView;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class UCropActivity extends AppCompatActivity {
     public static final int ROTATE = 2;
     public static final int ALL = 3;
 
+   // public  static File file=new File(getCacheDir(), "SampleCropImage.jpg");
     @IntDef({NONE, SCALE, ROTATE, ALL})
     @Retention(RetentionPolicy.SOURCE)
     public @interface GestureTypes {

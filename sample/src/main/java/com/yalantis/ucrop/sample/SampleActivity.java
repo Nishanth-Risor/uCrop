@@ -365,6 +365,16 @@ public class SampleActivity extends BaseActivity implements UCropFragmentCallbac
         final Uri resultUri = UCrop.getOutput(result);
         if (resultUri != null) {
             ResultActivity.startWithUri(SampleActivity.this, resultUri);
+            /*
+            Intent i = new Intent(this, ResultActivityNew.class);
+            i.putExtra("resulturi", resultUri.toString());
+            startActivity(i);
+
+            //ew ResultActivityNew().startWithUri(SampleActivity.this, resultUri);
+            //finish();
+
+             */
+
         } else {
             Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
         }

@@ -16,10 +16,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
+import com.yalantis.ucrop.view.GestureCropImageView;
 import com.yalantis.ucrop.view.UCropView;
 
 import java.io.File;
@@ -66,6 +70,54 @@ public class ResultActivity extends BaseActivity {
                 uCropView.getOverlayView().setShowCropFrame(false);
                 uCropView.getOverlayView().setShowCropGrid(false);
                 uCropView.getOverlayView().setDimmedColor(Color.TRANSPARENT);
+
+
+
+                final GestureDetector mGestureDetector=new GestureDetector(new GestureDetector.OnGestureListener() {
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onShowPress(MotionEvent e) {
+
+                    }
+
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        return false;
+                    }
+                });
+                GestureCropImageView mgestureCropImageView=findViewById(R.id.image_view_crop);
+                mgestureCropImageView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+
+                        mGestureDetector.onTouchEvent(event);
+
+                        return true;
+                    }
+                });
+
+
+
+
             } catch (Exception e) {
                 Log.e(TAG, "setImageUri", e);
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
