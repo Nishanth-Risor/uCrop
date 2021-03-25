@@ -1,18 +1,29 @@
 package com.yalantis.ucrop.task;
 
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+//import com.bumptech.glide.Glide;
+//import com.bumptech.glide.request.RequestOptions;
+//import com.bumptech.glide.request.target.CustomTarget;
+//import com.bumptech.glide.request.transition.Transition;
 import com.yalantis.ucrop.UCropActivity;
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.model.ExifInfo;
@@ -25,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import jp.wasabeef.blurry.Blurry;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -39,9 +52,11 @@ import okio.Sink;
  */
 public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapWorkerResult> {
 
+    private static final float BLUR_RADIUS = 25f;
     private static final String TAG = "BitmapWorkerTask";
 
     private static final int MAX_BITMAP_SIZE = 100 * 1024 * 1024;   // 100 MB
+    private static final float BITMAP_SCALE = 0.6f;
 
     private final Context mContext;
     private Uri mInputUri;
@@ -161,15 +176,31 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
             float aspectrxy=(float)x/y;
             float aspectryx=(float)y/x;
 
+            int mrh, mrw;
+            //if(mRequiredWidth==0  || mRequiredHeight==0) {
+                mrh = 1600;
+                mrw = 900;
+           // }
+            /*
+            else
+            {
+              mrh=mRequiredHeight;
+              mrw=mRequiredWidth;
+            }
 
-            int mrh=1600, mrw=900;
+             */
 
-            if(x<=mrh && y>mrw)
+            if(x==mrh && y==mrw)
+            {
+                rwidth=mrw;
+                rheight=mrh;
+            }
+            else if(x<=mrh && y>mrw)
             {
                 rwidth=mrw;
                 rheight= (int) (aspectrxy*rwidth);
             }
-            else if(x<=mrh && y<=mrw)
+            else if(x<mrh && y<mrw)
             {
 
                 float aspectratioframe=(float) mrw/mrh;
@@ -197,7 +228,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
             }
             else
             {
-                if(mrw<=mrh)
+                if(y>x)
                 {
                     rwidth=mrw;
                     rheight=(int)(aspectrxy*rwidth);
@@ -215,20 +246,76 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
 
             Bitmap finalbitmap= getResizedBitmap(decodeSampledBitmap, rwidth, rheight);
-            Bitmap reqbitmap = Bitmap.createBitmap(mrw, mrh, finalbitmap.getConfig());
+             Bitmap reqbitmap = Bitmap.createBitmap(mrw, mrh, Bitmap.Config.ARGB_4444);
+            // reqbitmap=getResizedBitmap(reqbitmap, mrw, mrh);
 
             // Instantiate a canvas and prepare it to paint to the new bitmap
             Canvas canvas = new Canvas(reqbitmap);
 
             // Paint it white (or whatever color you want)
-            canvas.drawColor(Color.RED);
+
+            int multiplier=1;
+            while(rwidth*multiplier<mrw || rheight*multiplier<mrh)
+            {
+
+                multiplier*=2;
+            }
+          int tw=(int)rwidth/multiplier;
+            int th=(int)rheight/multiplier;
+            int cx=(rwidth-tw)/2;
+            int cy=(rheight-th)/2;
+
+
+
+            Bitmap backbitmap = getResizedBitmap(Bitmap.createBitmap(finalbitmap, cx, cy, tw, th), mrw, mrh);
+            backbitmap=backbitmap.copy(backbitmap.getConfig(), true);
+            if(multiplier!=1)
+            backbitmap=blur(backbitmap);
+            canvas.drawBitmap(backbitmap, 0, 0, null);
+
+
+
+
+
+          //  Blurry.with(mContext).from(backbitmap).into(backbitmap)
+          //  canvas.drawBitmap(backbitmap, 0, 0, null);
+
+
+
+            /*
+               final Bitmap[] backbitmap = {getResizedBitmap(Bitmap.createBitmap(finalbitmap, cx, cy, tw, th), mrw, mrh)};
+            for(int i=1;i<=3000;i++) {
+
+                Glide.with(mContext).asBitmap().load(backbitmap[0])
+                        .apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 1)))
+                        .into(new CustomTarget<Bitmap>() {
+
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+
+                                // canvas.drawBitmap(resource, 0, 0, null);
+                                backbitmap[0] =Bitmap.createBitmap(resource);
+
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                            }
+                        });
+            }
+
+
+
+
+
+            canvas.drawBitmap(backbitmap[0], 0, 0, null);
+
+             */
 
             // Draw the old bitmap ontop of the new white one
             //int minw = Math.min(mRequiredWidth, decodeSampledBitmap.getWidth()), minh = Math.min(mRequiredHeight, decodeSampledBitmap.getHeight());
 
-            int spcw=(mrw-rwidth+1)/2;
-            int spch=(mrh-rheight+1)/2;
-            canvas.drawBitmap(finalbitmap, spcw, spch, null);
 
             /*
             int minw = Math.min(mRequiredWidth, decodeSampledBitmap.getWidth()), minh = Math.min(mRequiredHeight, decodeSampledBitmap.getHeight());
@@ -265,7 +352,14 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
              */
 
-            decodeSampledBitmap=reqbitmap;
+
+
+            int spcw=(mrw-rwidth+1)/2;
+            int spch=(mrh-rheight+1)/2;
+            canvas.drawBitmap(finalbitmap, spcw, spch, null);
+
+            decodeSampledBitmap=reqbitmap.copy(reqbitmap.getConfig(), true);
+
 
             File file = new File(mInputUri.getPath());
             OutputStream fOut = null;
@@ -316,6 +410,48 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
         }
 
         return new BitmapWorkerResult(decodeSampledBitmap, exifInfo);
+    }
+
+    public Bitmap blur(Bitmap image) {
+        if (null == image) return null;
+
+
+        Bitmap outputBitmap = Bitmap.createBitmap(image);
+        final RenderScript renderScript = RenderScript.create(mContext);
+
+        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
+        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+        //Intrinsic Gausian blur filter
+
+
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        theIntrinsic.setRadius(BLUR_RADIUS);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+        for(int i=1;i<=30;i++)
+        {
+
+
+           // tmpIn = Allocation.createFromBitmap(renderScript, outputBitmap);
+            tmpIn=tmpOut;
+            tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+            //Intrinsic Gausian blur filter
+
+
+            theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+            theIntrinsic.setRadius(BLUR_RADIUS);
+            theIntrinsic.setInput(tmpIn);
+            theIntrinsic.forEach(tmpOut);
+            tmpOut.copyTo(outputBitmap);
+        }
+
+
+
+
+        return outputBitmap;
     }
 
     private void processInputUri() throws NullPointerException, IOException {

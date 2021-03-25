@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="4">
+
+    <Button
+        android:layout_margin="5dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:backgroundTint="#FF6300"
+       android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:id="@+id/type"
+        android:textStyle="bold"
+        android:text="Type">
+
+
+
+    </Button>
+    <Button
+        android:layout_margin="5dp"
+        android:text="Add"
+        android:id="@+id/add"
+        android:backgroundTint="#FF6300"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:textStyle="bold"
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+
+    </Button>
+
+    <Button
+        android:layout_margin="5dp"
+        android:text="Remove"
+        android:id="@+id/remove"
+        android:backgroundTint="#FF6300"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:textStyle="bold"
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+
+    </Button>
+    <Button
+        android:layout_margin="5dp"
+        android:text="Save Text"
+        android:id="@+id/save"
+        android:backgroundTint="#FF6300"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:textStyle="bold"
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+
+    </Button>
+
+</LinearLayout>

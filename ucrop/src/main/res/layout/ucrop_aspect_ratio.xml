@@ -4,4 +4,4 @@
     <com.yalantis.ucrop.view.widget.AspectRatioTextView
         style="@style/ucrop_TextViewCropAspectRatio"/>
 
-</FrameLayout>
+</FrameLayout> 

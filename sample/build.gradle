@@ -9,6 +9,9 @@ android {
         targetSdkVersion 29
         versionCode 13
         versionName "1.2.4"
+
+        renderscriptTargetApi 18
+        renderscriptSupportModeEnabled true
     }
     flavorDimensions "default"
     buildTypes {
@@ -35,6 +38,8 @@ android {
 }
 
 dependencies {
+    compile 'com.divyanshu.colorseekbar:colorseekbar:1.0.2'
+
     implementation "androidx.appcompat:appcompat:${androidx_appcompat_version}"
     implementation "androidx.core:core:${androidx_core_version}"
     implementation "androidx.constraintlayout:constraintlayout:${constraintlayout_version}"

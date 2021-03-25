@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+
+            android:backgroundTint="#FF6300"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:id="@+id/none"
+            android:textStyle="bold"
+            android:text="None">
+
+
+
+        </Button>
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+
+            android:backgroundTint="#FF6300"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:id="@+id/grey"
+            android:textStyle="bold"
+            android:text="Grey">
+
+
+
+
+        </Button>
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+
+            android:backgroundTint="#FF6300"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:id="@+id/invert"
+            android:textStyle="bold"
+            android:text="Invert">
+
+
+
+        </Button>
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+
+            android:backgroundTint="#FF6300"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:id="@+id/sketch"
+            android:textStyle="bold"
+            android:text="Sketch">
+
+
+
+        </Button>
+
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+
+            android:backgroundTint="#FF6300"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:id="@+id/highlight"
+            android:textStyle="bold"
+            android:text="Highlight">
+
+
+
+        </Button>
+
+
+
+    </LinearLayout>
+    </HorizontalScrollView>
+
+
+
+</LinearLayout>

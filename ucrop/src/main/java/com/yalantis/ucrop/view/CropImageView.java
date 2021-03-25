@@ -115,6 +115,11 @@ public class CropImageView extends TransformImageView {
      *
      * @param cropRect - new crop rectangle
      */
+
+    public RectF getCropRect()
+    {
+        return mCropRect;
+    }
     public void setCropRect(RectF cropRect) {
         mTargetAspectRatio = cropRect.width() / cropRect.height();
         mCropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
@@ -262,7 +267,7 @@ public class CropImageView extends TransformImageView {
         removeCallbacks(mZoomImageToPositionRunnable);
     }
 
-    public void setImageToWrapCropBounds() {
+    public  void setImageToWrapCropBounds() {
         setImageToWrapCropBounds(true);
     }
 

@@ -94,7 +94,8 @@ public class SampleActivity extends BaseActivity implements UCropFragmentCallbac
                 } else {
                     Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == UCrop.REQUEST_CROP) {
+            }
+            else if (requestCode == UCrop.REQUEST_CROP) {
                 handleCropResult(data);
             }
         }

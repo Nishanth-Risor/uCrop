@@ -17,4 +17,7 @@
         android:layout_height="match_parent"
         android:padding="@dimen/ucrop_padding_crop_frame"/>
 
+    <include layout="@layout/text"/>
+
+
 </merge>

@@ -31,6 +31,18 @@
         <include
             android:id="@+id/layout_scale_wheel"
             layout="@layout/ucrop_layout_scale_wheel" />
+        <include
+            android:id="@+id/layout_add_text"
+            layout="@layout/ucrop_add_text" />
+
+        <include
+            android:id="@+id/layout_add_filters"
+            layout="@layout/ucrop_add_filters" />
+
+
+
+
+
 
     </FrameLayout>
 
@@ -98,6 +110,38 @@
                 android:id="@+id/text_view_scale"
                 style="@style/ucrop_TextViewWidget"
                 android:text="@string/ucrop_scale" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/state_addtext"
+            style="@style/ucrop_WrapperIconState">
+
+            <ImageView
+                android:id="@+id/image_view_state_addtext"
+                style="@style/ucrop_ImageViewWidgetIcon"
+                app:srcCompat="@drawable/ucrop_addtext" />
+
+            <TextView
+                android:id="@+id/text_view_addtext"
+                style="@style/ucrop_TextViewWidget"
+                android:text="@string/ucrop_addtext" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/state_addfilters"
+            style="@style/ucrop_WrapperIconState">
+
+            <ImageView
+                android:id="@+id/image_view_state_addfilters"
+                style="@style/ucrop_ImageViewWidgetIcon"
+                app:srcCompat="@drawable/ucrop_addfilters" />
+
+            <TextView
+                android:id="@+id/text_view_addfilters"
+                style="@style/ucrop_TextViewWidget"
+                android:text="@string/ucrop_addfilters" />
 
         </LinearLayout>
     </LinearLayout>

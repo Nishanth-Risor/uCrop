@@ -47,6 +47,7 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.POWER_SERVICE;
 
 @SuppressWarnings("ConstantConditions")
 public class UCropFragment extends Fragment {
@@ -59,6 +60,7 @@ public class UCropFragment extends Fragment {
     public static final int ROTATE = 2;
     public static final int ALL = 3;
 
+
     @IntDef({NONE, SCALE, ROTATE, ALL})
     @Retention(RetentionPolicy.SOURCE)
     public @interface GestureTypes {
@@ -67,7 +69,7 @@ public class UCropFragment extends Fragment {
     public static final String TAG = "UCropFragment";
 
     private static final long CONTROLS_ANIMATION_DURATION = 50;
-    private static final int TABS_COUNT = 3;
+    private static final int TABS_COUNT = 4;
     private static final int SCALE_WIDGET_SENSITIVITY_COEFFICIENT = 15000;
     private static final int ROTATE_WIDGET_SENSITIVITY_COEFFICIENT = 42;
     private UCropFragmentCallback callback;
@@ -85,15 +87,15 @@ public class UCropFragment extends Fragment {
     private UCropView mUCropView;
     private GestureCropImageView mGestureCropImageView;
     private OverlayView mOverlayView;
-    private ViewGroup mWrapperStateAspectRatio, mWrapperStateRotate, mWrapperStateScale;
-    private ViewGroup mLayoutAspectRatio, mLayoutRotate, mLayoutScale;
+    private ViewGroup mWrapperStateAspectRatio, mWrapperStateRotate, mWrapperStateScale, mWrapperStateAddText;
+    private ViewGroup mLayoutAspectRatio, mLayoutRotate, mLayoutScale, mLayoutAddText;
     private List<ViewGroup> mCropAspectRatioViews = new ArrayList<>();
     private TextView mTextViewRotateAngle, mTextViewScalePercent;
     private View mBlockingView;
 
     private Bitmap.CompressFormat mCompressFormat = DEFAULT_COMPRESS_FORMAT;
     private int mCompressQuality = DEFAULT_COMPRESS_QUALITY;
-    private int[] mAllowedGestures = new int[]{SCALE, ROTATE, ALL};
+    private int[] mAllowedGestures = new int[]{SCALE, ROTATE, ALL, NONE};
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -161,20 +163,27 @@ public class UCropFragment extends Fragment {
             mWrapperStateRotate.setOnClickListener(mStateClickListener);
             mWrapperStateScale = view.findViewById(R.id.state_scale);
             mWrapperStateScale.setOnClickListener(mStateClickListener);
+            mWrapperStateAddText= view.findViewById(R.id.state_addtext);
+            mWrapperStateAddText.setOnClickListener(mStateClickListener);
 
             mLayoutAspectRatio = view.findViewById(R.id.layout_aspect_ratio);
             mLayoutRotate = view.findViewById(R.id.layout_rotate_wheel);
             mLayoutScale = view.findViewById(R.id.layout_scale_wheel);
+            mLayoutAddText=view.findViewById(R.id.layout_add_text);
 
             setupAspectRatioWidget(args, view);
             setupRotateWidget(view);
             setupScaleWidget(view);
+            setupAddTextWidget(view);
             setupStatesWrapper(view);
         } else {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.findViewById(R.id.ucrop_frame).getLayoutParams();
             params.bottomMargin = 0;
             view.findViewById(R.id.ucrop_frame).requestLayout();
         }
+    }
+
+    private void setupAddTextWidget(View view) {
     }
 
     private void setImageData(@NonNull Bundle bundle) {
@@ -303,16 +312,20 @@ public class UCropFragment extends Fragment {
     };
 
     /**
-     * Use {@link #mActiveWidgetColor} for color filter
+     *
+     *  Use {@link #mActiveWidgetColor} for color filter
      */
     private void setupStatesWrapper(View view) {
         ImageView stateScaleImageView = view.findViewById(R.id.image_view_state_scale);
         ImageView stateRotateImageView = view.findViewById(R.id.image_view_state_rotate);
         ImageView stateAspectRatioImageView = view.findViewById(R.id.image_view_state_aspect_ratio);
+        ImageView stateAddTextImageView = view.findViewById(R.id.image_view_state_addtext);
+        
 
         stateScaleImageView.setImageDrawable(new SelectedStateListDrawable(stateScaleImageView.getDrawable(), mActiveControlsWidgetColor));
         stateRotateImageView.setImageDrawable(new SelectedStateListDrawable(stateRotateImageView.getDrawable(), mActiveControlsWidgetColor));
         stateAspectRatioImageView.setImageDrawable(new SelectedStateListDrawable(stateAspectRatioImageView.getDrawable(), mActiveControlsWidgetColor));
+        stateAddTextImageView.setImageDrawable(new SelectedStateListDrawable(stateAddTextImageView.getDrawable(), mActiveControlsWidgetColor));
     }
 
     private void setupAspectRatioWidget(@NonNull Bundle bundle, View view) {
@@ -496,10 +509,12 @@ public class UCropFragment extends Fragment {
         mWrapperStateAspectRatio.setSelected(stateViewId == R.id.state_aspect_ratio);
         mWrapperStateRotate.setSelected(stateViewId == R.id.state_rotate);
         mWrapperStateScale.setSelected(stateViewId == R.id.state_scale);
+        mWrapperStateAddText.setSelected(stateViewId==R.id.state_addtext);
 
         mLayoutAspectRatio.setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
         mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
         mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
+        mLayoutAddText.setVisibility(stateViewId == R.id.state_addtext ? View.VISIBLE : View.GONE);
 
         changeSelectedTab(stateViewId);
 
@@ -507,7 +522,12 @@ public class UCropFragment extends Fragment {
             setAllowedGestures(0);
         } else if (stateViewId == R.id.state_rotate) {
             setAllowedGestures(1);
-        } else {
+        } 
+        else if(stateViewId == R.id.state_addtext)
+        {
+            setAllowedGestures(3); 
+        }
+        else {
             setAllowedGestures(2);
         }
     }
@@ -519,6 +539,7 @@ public class UCropFragment extends Fragment {
         mWrapperStateScale.findViewById(R.id.text_view_scale).setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
         mWrapperStateAspectRatio.findViewById(R.id.text_view_crop).setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
         mWrapperStateRotate.findViewById(R.id.text_view_rotate).setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
+        mWrapperStateAddText.findViewById(R.id.text_view_addtext).setVisibility(stateViewId == R.id.state_addtext ? View.VISIBLE : View.GONE);
     }
 
     private void setAllowedGestures(int tab) {

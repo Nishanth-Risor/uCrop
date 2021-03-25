@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/ucrop_color_toolbar"
-        android:minHeight="?attr/actionBarSize">
+        android:minHeight="?attr/actionBarSize"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/toolbar_title"
@@ -54,5 +55,50 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:visibility="gone" />
+
+
+    <Button
+        android:id="@+id/cancelucropbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:textColor="@color/ucrop_color_white"
+
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
+
+    <ImageView
+        android:id="@+id/rotate90"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         android:src="@drawable/ic_rotate90"
+
+        android:layout_centerHorizontal="true"
+
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
+    <Button
+        android:id="@+id/doneucropbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:textColor="@color/ucrop_color_white"
+
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
+
 
 </RelativeLayout>
