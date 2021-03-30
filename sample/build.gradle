@@ -38,8 +38,10 @@ android {
 }
 
 dependencies {
-    compile 'com.divyanshu.colorseekbar:colorseekbar:1.0.2'
 
+    implementation 'com.github.rtugeek:colorseekbar:1.7.7'
+
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation "androidx.appcompat:appcompat:${androidx_appcompat_version}"
     implementation "androidx.core:core:${androidx_core_version}"
     implementation "androidx.constraintlayout:constraintlayout:${constraintlayout_version}"

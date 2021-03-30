@@ -8,12 +8,9 @@
     android:background="#000">
 
     <ImageView
-        android:layout_width="900px"
-        android:layout_height="1600px"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
         android:layout_centerVertical="true"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
@@ -25,6 +22,33 @@
 
 
     </ImageView>
+
+    <LinearLayout
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/swipeupbtn"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrowup"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filters"
+            android:textColor="@color/white"
+            android:textSize="24dp"/>
+
+    </LinearLayout>
+
+
 
     <ToggleButton
         android:id="@+id/addtext"
@@ -67,6 +91,25 @@
 
 
     </ImageButton>
+    <ImageButton
+        android:id="@+id/deletetext"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+
+
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+
+        android:visibility="gone"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/delete_background"
+        android:src="@drawable/ic_delete">
+
+
+    </ImageButton>
 
 
     <ImageButton
@@ -93,11 +136,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/edittext"
         android:textColor="@color/white"
-        android:textSize="25sp"
+        android:textSize="25dp"
 
         android:visibility="gone"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="100dp"
 
         >
 
@@ -107,26 +150,114 @@
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:textColor="@color/black"
-        android:textSize="25sp"
+        android:textSize="25dp"
 
         android:visibility="gone"
+
         android:layout_marginLeft="50dp"
         android:layout_marginTop="100dp"
-
         >
 
     </TextView>
 
+
+    <com.rtugeek.android.colorseekbar.ColorSeekBar
+        android:id="@+id/color_seek_bar"
+        android:layout_width="30dp"
+        app:colorSeeds="@array/material_colors"
+        app:isVertical="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="14dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addtext"
+        android:visibility="gone"
+        android:layout_toRightOf="@+id/cropimage"/>
+    <!--
     <com.divyanshu.colorseekbar.ColorSeekBar
         android:id="@+id/color_seek_bar"
         android:layout_width="10dp"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
        android:layout_marginTop="30dp"
+           android:layout_marginRight="14dp"
 
+
+       />
+       -->
+
+    <LinearLayout
+
+        android:gravity="center"
         android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="250px"
+       android:id="@+id/filters"
+        android:orientation="horizontal">
 
-        android:layout_below="@+id/addtext"
-        android:layout_toRightOf="@id/cropimage"/>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/filtersnone">
+            <include layout="@layout/filterbase">
+
+            </include>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/filtersinvert">
+            <include layout="@layout/filterbase">
+
+            </include>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/filtersbw">
+            <include layout="@layout/filterbase">
+
+            </include>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/filtershighlight">
+            <include layout="@layout/filterbase">
+
+            </include>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/filtersflea">
+        <include layout="@layout/filterbase">
+
+        </include>
+    </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginHorizontal="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/filterssnow">
+            <include layout="@layout/filterbase">
+
+            </include>
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
 
 
 </RelativeLayout>
