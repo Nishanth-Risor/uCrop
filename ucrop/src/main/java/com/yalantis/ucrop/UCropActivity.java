@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -116,6 +117,9 @@ public class UCropActivity extends AppCompatActivity {
     private int mCompressQuality = DEFAULT_COMPRESS_QUALITY;
     private int[] mAllowedGestures = new int[]{SCALE, ROTATE, ALL};
 
+    private Button doneCrop, cancelCrop;
+
+    private ImageView rotate90;
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
@@ -124,13 +128,41 @@ public class UCropActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ucrop_activity_photobox);
-
         final Intent intent = getIntent();
 
         setupViews(intent);
         setImageData(intent);
         setInitialState();
         addBlockingView();
+        setUpOnClickOfDoneCancelRotate();
+    }
+
+    private void setUpOnClickOfDoneCancelRotate() {
+
+        cancelCrop=findViewById(R.id.cancelucropbtn);
+        doneCrop=findViewById(R.id.doneucropbtn);
+        rotate90=findViewById(R.id.rotate90);
+
+        cancelCrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+        rotate90.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rotateByAngle(90);
+            }
+        });
+        doneCrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                cropAndSaveImage();
+
+            }
+        });
     }
 
     @Override
@@ -295,7 +327,8 @@ public class UCropActivity extends AppCompatActivity {
         mToolbarTitle = intent.getStringExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_TOOLBAR);
         mToolbarTitle = mToolbarTitle != null ? mToolbarTitle : getResources().getString(R.string.ucrop_label_edit_photo);
         mLogoColor = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_LOGO_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_default_logo));
-        mShowBottomControls = !intent.getBooleanExtra(UCrop.Options.EXTRA_HIDE_BOTTOM_CONTROLS, false);
+        //mShowBottomControls = !intent.getBooleanExtra(UCrop.Options.EXTRA_HIDE_BOTTOM_CONTROLS, true);
+        mShowBottomControls=false;
         mRootViewBackgroundColor = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_ROOT_VIEW_BACKGROUND_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_crop_background));
 
         setupAppBar();
