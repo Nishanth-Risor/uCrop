@@ -672,8 +672,9 @@ public class UCropActivity extends AppCompatActivity {
     }
 
     private void setAllowedGestures(int tab) {
-        mGestureCropImageView.setScaleEnabled(true);
-        mGestureCropImageView.setRotateEnabled(true);
+       tab=2;
+       mGestureCropImageView.setScaleEnabled(mAllowedGestures[tab] == ALL || mAllowedGestures[tab] == SCALE);
+       mGestureCropImageView.setRotateEnabled(mAllowedGestures[tab] == ALL || mAllowedGestures[tab] == ROTATE);
     }
 
     /**
