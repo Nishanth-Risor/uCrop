@@ -51,7 +51,8 @@ public class UCrop {
 
     public static final String EXTRA_MAX_SIZE_X = EXTRA_PREFIX + ".MaxSizeX";
     public static final String EXTRA_MAX_SIZE_Y = EXTRA_PREFIX + ".MaxSizeY";
-
+    public static final String EXTRA_OUTPUT_ROTATION=EXTRA_PREFIX+".Rotation";
+    
     private Intent mCropIntent;
     private Bundle mCropOptionsBundle;
 
