@@ -29,7 +29,6 @@ public class FastBitmapDrawable extends Drawable {
     private Bitmap mBitmap;
     private int mAlpha;
     private int mWidth, mHeight;
-
     public FastBitmapDrawable(Bitmap b) {
         mAlpha = 255;
         setBitmap(b);

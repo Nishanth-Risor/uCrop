@@ -73,7 +73,7 @@ public class CropImageView extends TransformImageView {
     public void cropAndSaveImage(@NonNull Bitmap.CompressFormat compressFormat, int compressQuality,
                                  @Nullable BitmapCropCallback cropCallback) {
         cancelAllAnimations();
-        setImageToWrapCropBounds(false);
+        setImageToWrapCropBounds(true);
 
         final ImageState imageState = new ImageState(
                 mCropRect, RectUtils.trapToRect(mCurrentImageCorners),

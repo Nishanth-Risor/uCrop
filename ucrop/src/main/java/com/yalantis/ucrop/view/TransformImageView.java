@@ -6,9 +6,12 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.uvstudio.him.photofilterlibrary.PhotoFilter;
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.model.ExifInfo;
 import com.yalantis.ucrop.util.BitmapLoadUtils;
@@ -18,6 +21,7 @@ import com.yalantis.ucrop.util.RectUtils;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageView;
 
 /**
@@ -54,7 +58,7 @@ public class TransformImageView extends AppCompatImageView {
 
     private String mImageInputPath, mImageOutputPath;
     private ExifInfo mExifInfo;
-
+    private Bitmap mOriginalBitmap;
     /**
      * Interface for rotation and scale change notifying.
      */
@@ -113,8 +117,10 @@ public class TransformImageView extends AppCompatImageView {
         return mMaxBitmapSize;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void setImageBitmap(final Bitmap bitmap) {
+
         setImageDrawable(new FastBitmapDrawable(bitmap));
     }
 
@@ -142,6 +148,7 @@ public class TransformImageView extends AppCompatImageView {
         BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize,
                 new BitmapLoadCallback() {
 
+                    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
                     @Override
                     public void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath) {
                         mImageInputPath = imageInputPath;
@@ -149,7 +156,9 @@ public class TransformImageView extends AppCompatImageView {
                         mExifInfo = exifInfo;
 
                         mBitmapDecoded = true;
-                        setImageBitmap(bitmap);
+                        mOriginalBitmap=bitmap.copy(bitmap.getConfig(), true);
+                        Bitmap previewBitmap=new PhotoFilter().two(getContext(), bitmap);
+                        setImageBitmap(previewBitmap);
                     }
 
                     @Override
@@ -202,11 +211,15 @@ public class TransformImageView extends AppCompatImageView {
 
     @Nullable
     public Bitmap getViewBitmap() {
+        return mOriginalBitmap;
+        /*
         if (getDrawable() == null || !(getDrawable() instanceof FastBitmapDrawable)) {
             return null;
         } else {
             return ((FastBitmapDrawable) getDrawable()).getBitmap();
         }
+
+         */
     }
 
     /**
