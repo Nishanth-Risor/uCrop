@@ -26,7 +26,7 @@ public class TextViewProperties extends ArrayList implements Parcelable {
         scaleY = in.readFloat();
     }
 
-    public final Creator<TextViewProperties> CREATOR = new Creator<TextViewProperties>() {
+    public final static Creator<TextViewProperties> CREATOR = new Creator<TextViewProperties>() {
         @Override
         public TextViewProperties createFromParcel(Parcel in) {
             return new TextViewProperties(in);
