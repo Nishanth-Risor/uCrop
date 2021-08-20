@@ -191,8 +191,26 @@ public class TransformImageView extends AppCompatImageView {
 
         }
         Bitmap finalBitmap = filteredBitmap.copy(filteredBitmap.getConfig(), true);
-
+        Canvas canvas=new Canvas(finalBitmap);
+        for (int i=0; i<textViewsNames.size();i++) {
+            UCrop.TextViewProperties textViewProperties = textViewsProperties.get(i);
+            TextPaint paint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            paint.setColor((int)textViewProperties.getColor());
+            paint.setTextSize(spToPx(16*textViewProperties.getScaleX(), getContext()));
+            String text = textViewsNames.get(i);
+            Rect rect = new Rect();
+            paint.getTextBounds(text, 0, text.length(), rect);
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.save();
+            canvas.rotate(textViewProperties.getRotation(), textViewProperties.getX(), textViewProperties.getY());
+            canvas.drawText(text, textViewProperties.getX(), textViewProperties.getY() + (rect.height() / 2F), paint);
+            canvas.restore();
+            canvas.save();
+        }
         return finalBitmap;
+    }
+    public int spToPx(float sp, Context context) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
     }
     /**
      * @return - current image scale value.
