@@ -16,7 +16,7 @@ import android.util.Log;
 import android.util.TypedValue;
 
 import com.uvstudio.him.photofilterlibrary.PhotoFilter;
-import com.yalantis.ucrop.TextViewProperties;
+import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.model.ExifInfo;
 import com.yalantis.ucrop.util.BitmapLoadUtils;
@@ -149,7 +149,7 @@ public class TransformImageView extends AppCompatImageView {
      * @param imageUri - image Uri
      * @throws Exception - can throw exception if having problems with decoding Uri or OOM.
      */
-    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri, final int filterType, final ArrayList<TextViewProperties> textViewsProperties, final ArrayList<String> textViewsNames) throws Exception {
+    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri, final int filterType, final ArrayList<UCrop.TextViewProperties> textViewsProperties, final ArrayList<String> textViewsNames) throws Exception {
         int maxBitmapSize = getMaxBitmapSize();
 
         BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize,
@@ -178,7 +178,7 @@ public class TransformImageView extends AppCompatImageView {
                 });
     }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private Bitmap generatePreviewBitmap(Bitmap bitmap, final int filterType, final ArrayList<TextViewProperties> textViewsProperties, final ArrayList<String> textViewsNames) {
+    private Bitmap generatePreviewBitmap(Bitmap bitmap, final int filterType, final ArrayList<UCrop.TextViewProperties> textViewsProperties, final ArrayList<String> textViewsNames) {
         Bitmap filteredBitmap;
         switch (filterType){
             case 1:filteredBitmap=new PhotoFilter().one(getContext(), bitmap);break;

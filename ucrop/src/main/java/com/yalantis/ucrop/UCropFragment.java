@@ -180,11 +180,14 @@ public class UCropFragment extends Fragment {
     private void setImageData(@NonNull Bundle bundle) {
         Uri inputUri = bundle.getParcelable(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = bundle.getParcelable(UCrop.EXTRA_OUTPUT_URI);
+        int filterType=bundle.getParcelable(UCrop.EXTRA_FILTER_TYPE);
+        ArrayList<UCrop.TextViewProperties> textViewsProperties= bundle.getParcelable(UCrop.EXTRA_TEXT_PROPERTIES);
+        ArrayList<String> textViewsNames=bundle.getParcelable(UCrop.EXTRA_TEXT_NAMES);
         processOptions(bundle);
 
         if (inputUri != null && outputUri != null) {
             try {
-                mGestureCropImageView.setImageUri(inputUri, outputUri);
+                mGestureCropImageView.setImageUri(inputUri, outputUri,filterType,textViewsProperties, textViewsNames );
             } catch (Exception e) {
                 callback.onCropFinish(getError(e));
             }
