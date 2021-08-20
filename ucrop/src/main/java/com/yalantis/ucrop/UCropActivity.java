@@ -57,9 +57,6 @@ import androidx.transition.AutoTransition;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
-import com.risor.ui.risorproductgallery.productimagecamera.AddedTextView;
-import com.risor.ui.buildingblocks.filters.FiltersContainer;
-
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
  */
@@ -229,13 +226,12 @@ public class UCropActivity extends AppCompatActivity {
     private void setImageData(@NonNull Intent intent) {
         Uri inputUri = intent.getParcelableExtra(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = intent.getParcelableExtra(UCrop.EXTRA_OUTPUT_URI);
-        FilterType filterType=intent.getParcelableExtra(UCrop.EXTRA_FILTER_TYPE);
-        ArrayList<AddedTextView> textViews=intent.getParcelableArrayListExtra(UCrop.EXTRA_ADDED_TEXT_VIEWS);
+        int filterType=intent.getIntExtra(UCrop.EXTRA_FILTER_TYPE, 0);
         processOptions(intent);
 
         if (inputUri != null && outputUri != null) {
             try {
-                mGestureCropImageView.setImageUri(inputUri, outputUri, mediaItem);
+                mGestureCropImageView.setImageUri(inputUri, outputUri, filterType);
             } catch (Exception e) {
                 setResultError(e);
                 finish();

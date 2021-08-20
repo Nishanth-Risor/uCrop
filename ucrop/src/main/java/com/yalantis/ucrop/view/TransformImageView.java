@@ -28,9 +28,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageView;
 
-import com.risor.ui.risorproductgallery.productimagecamera.AddedTextView;
-import com.risor.ui.buildingblocks.filters.FiltersContainer;
-
 import java.util.ArrayList;
 
 /**
@@ -151,7 +148,7 @@ public class TransformImageView extends AppCompatImageView {
      * @param imageUri - image Uri
      * @throws Exception - can throw exception if having problems with decoding Uri or OOM.
      */
-    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri, @NonNull final FilterType filterType, final ArrayList<AddedTextView> textViews ) throws Exception {
+    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri, final int filterType) throws Exception {
         int maxBitmapSize = getMaxBitmapSize();
 
         BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize,
@@ -166,7 +163,7 @@ public class TransformImageView extends AppCompatImageView {
 
                         mBitmapDecoded = true;
                         mOriginalBitmap=bitmap.copy(bitmap.getConfig(), true);
-                        Bitmap previewBitmap=generatePreviewBitmap(bitmap, filterType, textViews);
+                        Bitmap previewBitmap=generatePreviewBitmap(bitmap, filterType);
                         setImageBitmap(previewBitmap);
                     }
 
@@ -179,39 +176,22 @@ public class TransformImageView extends AppCompatImageView {
                     }
                 });
     }
-
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private Bitmap generatePreviewBitmap(Bitmap bitmap, @NonNull final FilterType filterType, final ArrayList<AddedTextView> textViews) {
+    private Bitmap generatePreviewBitmap(Bitmap bitmap, final int filterType) {
         Bitmap filteredBitmap;
         switch (filterType){
-            case FiltersContainer.FilterType.NONE:filteredBitmap=bitmap;break;
-            case FiltersContainer.FilterType.INVERT:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
-            case FiltersContainer.FilterType.BW:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
-            case FiltersContainer.FilterType.HIGHLIGHT:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
-            case FiltersContainer.FilterType.LIGHT:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
-            case FiltersContainer.FilterType.OIL:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
+            case 1:filteredBitmap=new PhotoFilter().one(getContext(), bitmap);break;
+            case 2:filteredBitmap=new PhotoFilter().two(getContext(), bitmap);break;
+            case 3:filteredBitmap=new PhotoFilter().three(getContext(), bitmap);break;
+            case 4:filteredBitmap=new PhotoFilter().twelve(getContext(), bitmap);break;
+            case 5:filteredBitmap=new PhotoFilter().thirteen(getContext(), bitmap);break;
+
+            default: filteredBitmap=bitmap;break;
 
         }
         Bitmap finalBitmap = filteredBitmap.copy(filteredBitmap.getConfig(), true);
-        Canvas canvas = new Canvas(finalBitmap);
-        for (int i=0; i<textViews.size();i++) {
-            AddedTextView addedTextView = textViews.get(i);
-            TextPaint paint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-            paint.setColor(addedTextView.getColor());
-            paint.setTextSize(TypedValue.COMPLEX_UNIT_SP,addedTextView.getScaleX() *16);
-            String text = addedTextView.getText();
-            Rect rect = new Rect();
-            paint.getTextBounds(text, 0, text.length(), rect);
-            paint.setTextAlign(Paint.Align.CENTER);
-            canvas.save();
-            canvas.rotate(addedTextView.getRotation(), addedTextView.getX(), addedTextView.getY());
-            canvas.drawText(text, addedTextView.getX(), addedTextView.getY() + (rect.height() / 2F), paint);
-            canvas.restore();
-            canvas.save();
-        }
         return finalBitmap;
     }
-
     /**
      * @return - current image scale value.
      * [1.0f - for original image, 2.0f - for 200% scaled image, etc.]

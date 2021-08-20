@@ -22,9 +22,6 @@ import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.risor.ui.risorproductgallery.productimagecamera.AddedTextView;
-import com.risor.ui.buildingblocks.filters.FiltersContainer;
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
  * <p/>
@@ -88,14 +85,6 @@ public class UCrop {
         mCropOptionsBundle.putFloat(EXTRA_ASPECT_RATIO_Y, y);
         return this;
     }
-    public UCrop withAddedTextViews(ArrayList<AddedTextView> textViews){
-        mCropOptionsBundle.putParcelableArrayList(EXTRA_ADDED_TEXT_VIEWS, textViews);
-        return this;
-    }
-    public UCrop withFilterType(FilterType filterType){
-        mCropOptionsBundle.putParcelable(EXTRA_FILTER_TYPE, filterType);
-        return this;
-    }
     /**
      * Set an aspect ratio for crop bounds that is evaluated from source image width and height.
      * User won't see the menu with other ratios options.
@@ -105,7 +94,10 @@ public class UCrop {
         mCropOptionsBundle.putFloat(EXTRA_ASPECT_RATIO_Y, 0);
         return this;
     }
-
+    public UCrop withFilterType(int x){
+        mCropOptionsBundle.putInt(EXTRA_FILTER_TYPE, x);
+        return this;
+    }
     /**
      * Set maximum size for result cropped image. Maximum size cannot be less then {@value MIN_SIZE}
      *
