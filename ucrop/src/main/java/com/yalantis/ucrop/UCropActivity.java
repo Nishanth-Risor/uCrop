@@ -227,7 +227,7 @@ public class UCropActivity extends AppCompatActivity {
         Uri inputUri = intent.getParcelableExtra(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = intent.getParcelableExtra(UCrop.EXTRA_OUTPUT_URI);
         int filterType=intent.getIntExtra(UCrop.EXTRA_FILTER_TYPE, 0);
-        ArrayList<UCrop.TextViewProperties> textViewsProperties= intent.getParcelableArrayListExtra(UCrop.EXTRA_TEXT_PROPERTIES);
+        ArrayList<TextViewProperties> textViewsProperties= intent.getParcelableArrayListExtra(UCrop.EXTRA_TEXT_PROPERTIES);
         ArrayList<String> textViewsNames=intent.getStringArrayListExtra(UCrop.EXTRA_TEXT_NAMES);
         processOptions(intent);
 

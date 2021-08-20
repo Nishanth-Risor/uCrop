@@ -181,7 +181,7 @@ public class UCropFragment extends Fragment {
         Uri inputUri = bundle.getParcelable(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = bundle.getParcelable(UCrop.EXTRA_OUTPUT_URI);
         int filterType=bundle.getParcelable(UCrop.EXTRA_FILTER_TYPE);
-        ArrayList<UCrop.TextViewProperties> textViewsProperties= bundle.getParcelable(UCrop.EXTRA_TEXT_PROPERTIES);
+        ArrayList<TextViewProperties> textViewsProperties= bundle.getParcelable(UCrop.EXTRA_TEXT_PROPERTIES);
         ArrayList<String> textViewsNames=bundle.getParcelable(UCrop.EXTRA_TEXT_NAMES);
         processOptions(bundle);
 
@@ -306,7 +306,7 @@ public class UCropFragment extends Fragment {
     };
 
     /**
-     * Use {@link #mActiveWidgetColor} for color filter
+     * Use {@link # mActiveWidgetColor} for color filter
      */
     private void setupStatesWrapper(View view) {
         ImageView stateScaleImageView = view.findViewById(R.id.image_view_state_scale);
