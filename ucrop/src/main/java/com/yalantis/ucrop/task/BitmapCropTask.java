@@ -1,10 +1,12 @@
 package com.yalantis.ucrop.task;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.yalantis.ucrop.callback.BitmapCropCallback;
@@ -52,10 +54,11 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
 
     private int mCroppedImageWidth, mCroppedImageHeight;
     private int cropOffsetX, cropOffsetY;
-
-    public BitmapCropTask(@Nullable Bitmap viewBitmap, @NonNull ImageState imageState, @NonNull CropParameters cropParameters,
+    private Context mContext;
+    public BitmapCropTask(@Nullable Context context,@Nullable Bitmap viewBitmap, @NonNull ImageState imageState, @NonNull CropParameters cropParameters,
                           @Nullable BitmapCropCallback cropCallback) {
 
+        mContext=context;
         mViewBitmap = viewBitmap;
         mCropRect = imageState.getCropRect();
         mCurrentImageRect = imageState.getCurrentImageRect();
@@ -86,10 +89,10 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
             return new NullPointerException("CurrentImageRect is empty");
         }
 
-        float resizeScale = resize();
-
+        //float resizeScale = resize();
+        updateCurrentScale();
         try {
-            crop(resizeScale);
+            crop();
             mViewBitmap = null;
         } catch (Throwable throwable) {
             return throwable;
@@ -98,7 +101,7 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         return null;
     }
 
-    private float resize() {
+    private void updateCurrentScale() {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(mImageInputPath, options);
@@ -125,10 +128,9 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
                 mCurrentScale /= resizeScale;
             }
         }
-        return resizeScale;
     }
 
-    private boolean crop(float resizeScale) throws IOException {
+    private boolean crop() throws IOException {
         ExifInterface originalExif = new ExifInterface(mImageInputPath);
 
         cropOffsetX = Math.round((mCropRect.left - mCurrentImageRect.left) / mCurrentScale);
@@ -138,11 +140,17 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
 
         boolean shouldCrop = shouldCrop(mCroppedImageWidth, mCroppedImageHeight);
         Log.i(TAG, "Should crop: " + shouldCrop);
-
+        float scaleX=1F, scaleY=1F;
+        DisplayMetrics displayMetrics=mContext.getResources().getDisplayMetrics();
+        float finalWidth = displayMetrics.widthPixels;
+        float finalHeight=displayMetrics.heightPixels;
+        scaleX=finalWidth/mCroppedImageWidth;
+        finalHeight=Math.min(finalHeight, mCroppedImageHeight*scaleX);
+        scaleY=finalHeight/mCroppedImageHeight;
         if (shouldCrop) {
             boolean cropped = cropCImg(mImageInputPath, mImageOutputPath,
                     cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight,
-                    mCurrentAngle, resizeScale, mCompressFormat.ordinal(), mCompressQuality,
+                    mCurrentAngle, scaleX,scaleY, mCompressFormat.ordinal(), mCompressQuality,
                     mExifInfo.getExifDegrees(), mExifInfo.getExifTranslation());
             if (cropped && mCompressFormat.equals(Bitmap.CompressFormat.JPEG)) {
                 ImageHeaderParser.copyExif(originalExif, mCroppedImageWidth, mCroppedImageHeight, mImageOutputPath);
@@ -177,7 +185,7 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
     native public static boolean
     cropCImg(String inputPath, String outputPath,
              int left, int top, int width, int height,
-             float angle, float resizeScale,
+             float angle, float resizeScaleX,float resizeScaleY,
              int format, int quality,
              int exifDegrees, int exifTranslation) throws IOException, OutOfMemoryError;
 
