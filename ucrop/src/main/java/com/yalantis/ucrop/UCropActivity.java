@@ -227,11 +227,13 @@ public class UCropActivity extends AppCompatActivity {
         Uri inputUri = intent.getParcelableExtra(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = intent.getParcelableExtra(UCrop.EXTRA_OUTPUT_URI);
         int filterType=intent.getIntExtra(UCrop.EXTRA_FILTER_TYPE, 0);
+        ArrayList<TextViewProperties> textViewsProperties= intent.getParcelableArrayListExtra(UCrop.EXTRA_TEXT_PROPERTIES);
+        ArrayList<String> textViewsNames=intent.getStringArrayListExtra(UCrop.EXTRA_TEXT_NAMES);
         processOptions(intent);
 
         if (inputUri != null && outputUri != null) {
             try {
-                mGestureCropImageView.setImageUri(inputUri, outputUri, filterType);
+                mGestureCropImageView.setImageUri(inputUri, outputUri, filterType, textViewsProperties, textViewsNames);
             } catch (Exception e) {
                 setResultError(e);
                 finish();

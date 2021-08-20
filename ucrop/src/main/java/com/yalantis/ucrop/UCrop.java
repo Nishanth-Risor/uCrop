@@ -37,7 +37,8 @@ public class UCrop {
 
     public static final String EXTRA_INPUT_URI = EXTRA_PREFIX + ".InputUri";
     public static final String EXTRA_FILTER_TYPE = EXTRA_PREFIX + ".FilterType";
-    public static final String EXTRA_ADDED_TEXT_VIEWS = EXTRA_PREFIX + ".AddedTextViews";
+    public static final String EXTRA_TEXT_PROPERTIES = EXTRA_PREFIX + ".TextProperties";
+    public static final String EXTRA_TEXT_NAMES = EXTRA_PREFIX + ".TextNames";
     public static final String EXTRA_OUTPUT_URI = EXTRA_PREFIX + ".OutputUri";
     public static final String EXTRA_OUTPUT_CROP_ASPECT_RATIO = EXTRA_PREFIX + ".CropAspectRatio";
     public static final String EXTRA_OUTPUT_IMAGE_WIDTH = EXTRA_PREFIX + ".ImageWidth";
@@ -96,6 +97,14 @@ public class UCrop {
     }
     public UCrop withFilterType(int x){
         mCropOptionsBundle.putInt(EXTRA_FILTER_TYPE, x);
+        return this;
+    }
+    public UCrop withTextProperties(ArrayList<TextViewProperties> textProperties){
+        mCropOptionsBundle.putParcelableArrayList(EXTRA_FILTER_TYPE, textProperties);
+        return this;
+    }
+    public UCrop withTextNames(ArrayList<String> textNames){
+        mCropOptionsBundle.putStringArrayList(EXTRA_TEXT_NAMES, textNames);
         return this;
     }
     /**
