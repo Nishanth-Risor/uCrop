@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-
 import com.yalantis.ucrop.model.AspectRatio;
 
 import java.util.ArrayList;
@@ -24,6 +23,8 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.risor.ui.risorproductgallery.productimagecamera.AddedTextView;
+import com.risor.ui.buildingblocks.filters.FiltersContainer;
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
  * <p/>
@@ -38,6 +39,8 @@ public class UCrop {
     private static final String EXTRA_PREFIX = BuildConfig.APPLICATION_ID;
 
     public static final String EXTRA_INPUT_URI = EXTRA_PREFIX + ".InputUri";
+    public static final String EXTRA_FILTER_TYPE = EXTRA_PREFIX + ".FilterType";
+    public static final String EXTRA_ADDED_TEXT_VIEWS = EXTRA_PREFIX + ".AddedTextViews";
     public static final String EXTRA_OUTPUT_URI = EXTRA_PREFIX + ".OutputUri";
     public static final String EXTRA_OUTPUT_CROP_ASPECT_RATIO = EXTRA_PREFIX + ".CropAspectRatio";
     public static final String EXTRA_OUTPUT_IMAGE_WIDTH = EXTRA_PREFIX + ".ImageWidth";
@@ -85,7 +88,14 @@ public class UCrop {
         mCropOptionsBundle.putFloat(EXTRA_ASPECT_RATIO_Y, y);
         return this;
     }
-
+    public UCrop withAddedTextViews(ArrayList<AddedTextView> textViews){
+        mCropOptionsBundle.putParcelableArrayList(EXTRA_ADDED_TEXT_VIEWS, textViews);
+        return this;
+    }
+    public UCrop withFilterType(FilterType filterType){
+        mCropOptionsBundle.putParcelable(EXTRA_FILTER_TYPE, filterType);
+        return this;
+    }
     /**
      * Set an aspect ratio for crop bounds that is evaluated from source image width and height.
      * User won't see the menu with other ratios options.
