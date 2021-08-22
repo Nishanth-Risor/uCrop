@@ -231,7 +231,7 @@ public class UCropActivity extends AppCompatActivity {
         ArrayList<String> textViewsNames=intent.getStringArrayListExtra(UCrop.EXTRA_TEXT_NAMES);
         processOptions(intent);
 
-        if (inputUri != null && outputUri != null) {
+        if (inputUri != null && outputUri != null ) {
             try {
                 mGestureCropImageView.setImageUri(inputUri, outputUri, filterType, textViewsProperties, textViewsNames);
             } catch (Exception e) {
