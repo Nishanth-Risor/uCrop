@@ -3,9 +3,12 @@ package com.yalantis.ucrop.task;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -17,6 +20,7 @@ import com.yalantis.ucrop.util.FileUtils;
 import com.yalantis.ucrop.util.ImageHeaderParser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
@@ -115,16 +119,19 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         mCurrentScale /= resizeScale;
 
         resizeScale = 1;
-        float cropWidth = mCropRect.width() / mCurrentScale;
-        float cropHeight = mCropRect.height() / mCurrentScale;
-        DisplayMetrics displayMetrics=mContext.getResources().getDisplayMetrics();
-        float finalWidth = displayMetrics.widthPixels;
-        float finalHeight=displayMetrics.heightPixels;
-        scaleX=finalWidth/cropWidth;
-        finalHeight=Math.min(finalHeight, cropHeight*scaleX);
-        scaleY=finalHeight/cropHeight;
-        resizeScale=Math.max(scaleX, scaleY);
-        mCurrentScale /= resizeScale;
+        if (mMaxResultImageSizeX > 0 && mMaxResultImageSizeY > 0) {
+            float cropWidth = mCropRect.width() / mCurrentScale;
+            float cropHeight = mCropRect.height() / mCurrentScale;
+
+            if (cropWidth > mMaxResultImageSizeX || cropHeight > mMaxResultImageSizeY) {
+
+                scaleX = mMaxResultImageSizeX / cropWidth;
+                scaleY = mMaxResultImageSizeY / cropHeight;
+                resizeScale = Math.min(scaleX, scaleY);
+
+                mCurrentScale /= resizeScale;
+            }
+        }
         return resizeScale;
     }
 
@@ -185,11 +192,31 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         if (mCropCallback != null) {
             if (t == null) {
                 Uri uri = Uri.fromFile(new File(mImageOutputPath));
-                mCropCallback.onBitmapCropped(uri, cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight);
+                Uri scaledUri=scaleToFit(uri);
+                mCropCallback.onBitmapCropped(scaledUri, cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight);
             } else {
                 mCropCallback.onCropFailure(t);
             }
         }
     }
-
+    private Uri scaleToFit(Uri uri){
+        File outputFile=new File(uri.getPath());
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
+            DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+            float finalWidth = displayMetrics.widthPixels;
+            float finalHeight = displayMetrics.heightPixels;
+            float scaleX = finalWidth / bitmap.getWidth();
+            finalHeight = Math.min(finalHeight, bitmap.getHeight() * scaleX);
+            float scaleY = finalHeight / bitmap.getHeight();
+            Bitmap finalBitmap = Bitmap.createBitmap((int) finalWidth, (int) finalHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(finalBitmap);
+            canvas.drawBitmap(bitmap, new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight()), new Rect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight()), null);
+            FileOutputStream out = new FileOutputStream(outputFile);
+            finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return Uri.fromFile(outputFile);
+    }
 }

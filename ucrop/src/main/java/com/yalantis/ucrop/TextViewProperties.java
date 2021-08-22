@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import kotlin.jvm.internal.Intrinsics;
 
-public class TextViewProperties extends ArrayList implements Parcelable {
+public class TextViewProperties implements Parcelable {
     private float x;
     private float y;
     private float color;

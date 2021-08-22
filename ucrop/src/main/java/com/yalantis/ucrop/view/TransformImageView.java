@@ -17,7 +17,6 @@ import android.util.TypedValue;
 
 import com.uvstudio.him.photofilterlibrary.PhotoFilter;
 import com.yalantis.ucrop.TextViewProperties;
-import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.model.ExifInfo;
 import com.yalantis.ucrop.util.BitmapLoadUtils;
@@ -198,7 +197,7 @@ public class TransformImageView extends AppCompatImageView {
                 TextViewProperties textViewProperties = textViewsProperties.get(i);
                 TextPaint paint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
                 paint.setColor((int) textViewProperties.getColor());
-                paint.setTextSize(spToPx(16 * textViewProperties.getScaleX(), getContext()));
+                paint.setTextSize(spToPx(16,getContext() )*textViewProperties.getScaleX());
                 String text = textViewsNames.get(i);
                 Rect rect = new Rect();
                 paint.getTextBounds(text, 0, text.length(), rect);
