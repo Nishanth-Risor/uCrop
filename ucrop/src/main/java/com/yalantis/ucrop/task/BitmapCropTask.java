@@ -98,6 +98,8 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         try {
             crop(resizeScale);
             mViewBitmap = null;
+            Uri uri = Uri.fromFile(new File(mImageOutputPath));
+            scaleToFit(uri);
         } catch (Throwable throwable) {
             return throwable;
         }
@@ -192,15 +194,14 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         if (mCropCallback != null) {
             if (t == null) {
                 Uri uri = Uri.fromFile(new File(mImageOutputPath));
-                Uri scaledUri=scaleToFit(uri);
-                mCropCallback.onBitmapCropped(scaledUri, cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight);
+                mCropCallback.onBitmapCropped(uri, cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight);
             } else {
                 mCropCallback.onCropFailure(t);
             }
         }
     }
     private Uri scaleToFit(Uri uri){
-        File outputFile=new File(uri.getPath());
+        File outputFile=new File(mImageOutputPath);
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
             DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
