@@ -47,7 +47,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
     private static final String TAG = "BitmapWorkerTask";
 
     private static final float BLUR_RADIUS = 25f;
-    private static final int MAX_BITMAP_SIZE = 100 * 1024 * 1024;   // 100 MB
+    private static final int MAX_BITMAP_SIZE = 10 * 1024 * 1024;   // 10 MB
 
     private final Context mContext;
     private Uri mInputUri;
@@ -135,6 +135,9 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
         if (isProfilePicture) {
             decodeSampledBitmap = preProcessProfilePicture(decodeSampledBitmap, options.outHeight, options.outWidth);
+            if (decodeSampledBitmap == null) {
+                return new BitmapWorkerResult(new IllegalArgumentException("Bitmap could not be decoded from the Uri: [" + mInputUri + "]"));
+            }
             scaleToView = calculateScale(true, options.outWidth, options.outHeight);
         }
 
@@ -297,7 +300,36 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return bmp;
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = BitmapLoadUtils.calculateInSampleSize(options, mRequiredWidth, mRequiredHeight);
+        options.inJustDecodeBounds = false;
+
+        Bitmap decodeSampledBitmap = null;
+        boolean decodeAttemptSuccess = false;
+        while (!decodeAttemptSuccess) {
+            try {
+                InputStream stream = mContext.getContentResolver().openInputStream(mInputUri);
+                try {
+                    decodeSampledBitmap = BitmapFactory.decodeStream(stream, null, options);
+                    if (options.outWidth == -1 || options.outHeight == -1) {
+                        return  null;
+                    }
+                } finally {
+                    BitmapLoadUtils.close(stream);
+                }
+                if (checkSize(decodeSampledBitmap, options)) continue;
+                decodeAttemptSuccess = true;
+            } catch (OutOfMemoryError error) {
+                Log.e(TAG, "doInBackground: BitmapFactory.decodeFileDescriptor: ", error);
+                options.inSampleSize *= 2;
+            } catch (IOException e) {
+                Log.e(TAG, "doInBackground: ImageDecoder.createSource: ", e);
+                return null;
+            }
+        }
+        return decodeSampledBitmap;
     }
 
     public float calculateScale(boolean isProfilePicture, int originalWeight, int originalHeight) {
