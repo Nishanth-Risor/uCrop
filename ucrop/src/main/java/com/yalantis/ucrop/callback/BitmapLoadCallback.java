@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public interface BitmapLoadCallback {
 
-    void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath);
+    void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath, float scale);
 
     void onFailure(@NonNull Exception bitmapWorkerException);
 

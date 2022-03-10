@@ -196,11 +196,12 @@ public class UCropActivity extends AppCompatActivity {
     private void setImageData(@NonNull Intent intent) {
         Uri inputUri = intent.getParcelableExtra(UCrop.EXTRA_INPUT_URI);
         Uri outputUri = intent.getParcelableExtra(UCrop.EXTRA_OUTPUT_URI);
+        boolean isProfilePicture = intent.getBooleanExtra(UCrop.IS_PROFILE_PICTURE, false);
         processOptions(intent);
 
         if (inputUri != null && outputUri != null) {
             try {
-                mGestureCropImageView.setImageUri(inputUri, outputUri);
+                mGestureCropImageView.setImageUri(inputUri, outputUri, isProfilePicture);
             } catch (Exception e) {
                 setResultError(e);
                 finish();
@@ -695,5 +696,4 @@ public class UCropActivity extends AppCompatActivity {
     protected void setResultError(Throwable throwable) {
         setResult(UCrop.RESULT_ERROR, new Intent().putExtra(UCrop.EXTRA_ERROR, throwable));
     }
-
 }

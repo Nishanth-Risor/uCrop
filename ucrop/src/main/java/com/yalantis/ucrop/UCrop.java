@@ -45,6 +45,7 @@ public class UCrop {
     public static final String EXTRA_OUTPUT_OFFSET_X = EXTRA_PREFIX + ".OffsetX";
     public static final String EXTRA_OUTPUT_OFFSET_Y = EXTRA_PREFIX + ".OffsetY";
     public static final String EXTRA_ERROR = EXTRA_PREFIX + ".Error";
+    public static final String IS_PROFILE_PICTURE = EXTRA_PREFIX + ".IsProfilePicture";
 
     public static final String EXTRA_ASPECT_RATIO_X = EXTRA_PREFIX + ".AspectRatioX";
     public static final String EXTRA_ASPECT_RATIO_Y = EXTRA_PREFIX + ".AspectRatioY";
@@ -565,6 +566,9 @@ public class UCrop {
             mOptionBundle.putInt(EXTRA_MAX_SIZE_Y, height);
         }
 
+        public void isProfilePicture(boolean isProfilePicture) {
+            mOptionBundle.putBoolean(IS_PROFILE_PICTURE, isProfilePicture);
+        }
     }
 
 }

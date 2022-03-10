@@ -121,6 +121,7 @@ public class CropImageView extends TransformImageView {
                 cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
         calculateImageScaleBounds();
         setImageToWrapCropBounds();
+        postScale(initialScaleToFit, mThisWidth/2F, mThisHeight/2F);
     }
 
     /**

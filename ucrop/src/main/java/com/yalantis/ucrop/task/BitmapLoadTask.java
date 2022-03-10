@@ -3,10 +3,18 @@ package com.yalantis.ucrop.task;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +24,7 @@ import com.yalantis.ucrop.model.ExifInfo;
 import com.yalantis.ucrop.util.BitmapLoadUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +46,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
     private static final String TAG = "BitmapWorkerTask";
 
+    private static final float BLUR_RADIUS = 25f;
     private static final int MAX_BITMAP_SIZE = 100 * 1024 * 1024;   // 100 MB
 
     private final Context mContext;
@@ -44,6 +54,8 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
     private Uri mOutputUri;
     private final int mRequiredWidth;
     private final int mRequiredHeight;
+    private final boolean isProfilePicture;
+    private float scaleToView = 1;
 
     private final BitmapLoadCallback mBitmapLoadCallback;
 
@@ -67,6 +79,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
     public BitmapLoadTask(@NonNull Context context,
                           @NonNull Uri inputUri, @Nullable Uri outputUri,
                           int requiredWidth, int requiredHeight,
+                          boolean isProfilePicture,
                           BitmapLoadCallback loadCallback) {
         mContext = context;
         mInputUri = inputUri;
@@ -74,6 +87,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
         mRequiredWidth = requiredWidth;
         mRequiredHeight = requiredHeight;
         mBitmapLoadCallback = loadCallback;
+        this.isProfilePicture = isProfilePicture;
     }
 
     @Override
@@ -117,6 +131,11 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
                 Log.e(TAG, "doInBackground: ImageDecoder.createSource: ", e);
                 return new BitmapWorkerResult(new IllegalArgumentException("Bitmap could not be decoded from the Uri: [" + mInputUri + "]", e));
             }
+        }
+
+        if (isProfilePicture) {
+            decodeSampledBitmap = preProcessProfilePicture(decodeSampledBitmap, options.outHeight, options.outWidth);
+            scaleToView = calculateScale(true, options.outWidth, options.outHeight);
         }
 
         if (decodeSampledBitmap == null) {
@@ -240,7 +259,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
     @Override
     protected void onPostExecute(@NonNull BitmapWorkerResult result) {
         if (result.mBitmapWorkerException == null) {
-            mBitmapLoadCallback.onBitmapLoaded(result.mBitmapResult, result.mExifInfo, mInputUri.getPath(), (mOutputUri == null) ? null : mOutputUri.getPath());
+            mBitmapLoadCallback.onBitmapLoaded(result.mBitmapResult, result.mExifInfo, mInputUri.getPath(), (mOutputUri == null) ? null : mOutputUri.getPath(), scaleToView);
         } else {
             mBitmapLoadCallback.onFailure(result.mBitmapWorkerException);
         }
@@ -253,5 +272,68 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
             return true;
         }
         return false;
+    }
+
+    public Bitmap preProcessProfilePicture(Bitmap bitmap, int originalHeight, int originalWeight) {
+        int canvasSide = (int) Math.sqrt(originalHeight * originalHeight + originalWeight * originalWeight);
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap bmp = Bitmap.createBitmap(canvasSide, canvasSide, conf); // this creates a MUTABLE bitmap
+        Canvas canvas = new Canvas(bmp);
+        Bitmap backgroundBitmap = BitmapLoadUtils.getResizedBitmap(bitmap, canvasSide, canvasSide);
+        Bitmap updatedBitmap = blur(backgroundBitmap);
+        canvas.drawBitmap(updatedBitmap, 0, 0, null);
+        int topOffset = (canvasSide - originalHeight) / 2;
+        int leftOffset = (canvasSide - originalWeight) / 2;
+        canvas.drawBitmap(bitmap, leftOffset, topOffset, null);
+        OutputStream fOut;
+        File file = new File(mInputUri.getPath());
+        try {
+            fOut = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 100% compression rate
+            fOut.flush();
+            fOut.close(); // do not forget to close the stream
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmp;
+    }
+
+    public float calculateScale(boolean isProfilePicture, int originalWeight, int originalHeight) {
+        if (isProfilePicture) {
+            int canvasSide = (int) Math.sqrt(originalHeight * originalHeight + originalWeight * originalWeight);
+            float sideToConsider = Math.min(originalHeight, originalWeight);
+            return canvasSide/sideToConsider;
+        } else {
+            return 1F;
+        }
+    }
+
+    public Bitmap blur(Bitmap image) {
+        if (null == image) return null;
+        Bitmap outputBitmap = Bitmap.createBitmap(image);
+        final RenderScript renderScript = RenderScript.create(mContext);
+
+        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
+        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        theIntrinsic.setRadius(BLUR_RADIUS);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+        for (int i = 1; i <= 5; i++) {
+            // tmpIn = Allocation.createFromBitmap(renderScript, outputBitmap);
+            tmpIn = tmpOut;
+            tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+            //Intrinsic Gausian blur filter
+            theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+            theIntrinsic.setRadius(BLUR_RADIUS);
+            theIntrinsic.setInput(tmpIn);
+            theIntrinsic.forEach(tmpOut);
+            tmpOut.copyTo(outputBitmap);
+        }
+        return outputBitmap;
     }
 }

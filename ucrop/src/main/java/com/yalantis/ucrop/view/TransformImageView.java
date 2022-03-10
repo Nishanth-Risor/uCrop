@@ -54,6 +54,7 @@ public class TransformImageView extends AppCompatImageView {
 
     private String mImageInputPath, mImageOutputPath;
     private ExifInfo mExifInfo;
+    protected float initialScaleToFit = 1;
 
     /**
      * Interface for rotation and scale change notifying.
@@ -136,18 +137,18 @@ public class TransformImageView extends AppCompatImageView {
      * @param imageUri - image Uri
      * @throws Exception - can throw exception if having problems with decoding Uri or OOM.
      */
-    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri) throws Exception {
+    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri, boolean isProfilePicture) throws Exception {
         int maxBitmapSize = getMaxBitmapSize();
 
-        BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize,
+        BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize, isProfilePicture,
                 new BitmapLoadCallback() {
 
                     @Override
-                    public void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath) {
+                    public void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath, float scale) {
                         mImageInputPath = imageInputPath;
                         mImageOutputPath = imageOutputPath;
                         mExifInfo = exifInfo;
-
+                        initialScaleToFit = scale;
                         mBitmapDecoded = true;
                         setImageBitmap(bitmap);
                     }

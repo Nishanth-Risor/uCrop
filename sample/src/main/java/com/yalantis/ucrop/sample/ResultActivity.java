@@ -62,7 +62,7 @@ public class ResultActivity extends BaseActivity {
         if (uri != null) {
             try {
                 UCropView uCropView = findViewById(R.id.ucrop);
-                uCropView.getCropImageView().setImageUri(uri, null);
+                uCropView.getCropImageView().setImageUri(uri, null, false);
                 uCropView.getOverlayView().setShowCropFrame(false);
                 uCropView.getOverlayView().setShowCropGrid(false);
                 uCropView.getOverlayView().setDimmedColor(Color.TRANSPARENT);

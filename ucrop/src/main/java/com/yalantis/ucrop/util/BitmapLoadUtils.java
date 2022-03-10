@@ -35,9 +35,10 @@ public class BitmapLoadUtils {
     public static void decodeBitmapInBackground(@NonNull Context context,
                                                 @NonNull Uri uri, @Nullable Uri outputUri,
                                                 int requiredWidth, int requiredHeight,
+                                                boolean isProfilePicture,
                                                 BitmapLoadCallback loadCallback) {
 
-        new BitmapLoadTask(context, uri, outputUri, requiredWidth, requiredHeight, loadCallback)
+        new BitmapLoadTask(context, uri, outputUri, requiredWidth, requiredHeight, isProfilePicture, loadCallback)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -172,5 +173,20 @@ public class BitmapLoadUtils {
             }
         }
     }
+
+    public static Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+        // "RECREATE" THE NEW BITMAP
+        return Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+    }
+
 
 }

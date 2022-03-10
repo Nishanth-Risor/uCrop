@@ -2,6 +2,7 @@ package com.yalantis.ucrop.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -70,6 +71,7 @@ public class GestureCropImageView extends CropImageView {
     public boolean onTouchEvent(MotionEvent event) {
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
             cancelAllAnimations();
+            getParent().requestDisallowInterceptTouchEvent(true);
         }
 
         if (event.getPointerCount() > 1) {
@@ -89,7 +91,13 @@ public class GestureCropImageView extends CropImageView {
 
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
             setImageToWrapCropBounds();
+            getParent().requestDisallowInterceptTouchEvent(false);
         }
+
+        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_CANCEL) {
+            getParent().requestDisallowInterceptTouchEvent(false);
+        }
+
         return true;
     }
 
