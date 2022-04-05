@@ -129,6 +129,12 @@ public class GestureCropImageView extends CropImageView {
             postScale(detector.getScaleFactor(), mMidPntX, mMidPntY);
             return true;
         }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            super.onScaleEnd(detector);
+            postScaleEnd();
+        }
     }
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {

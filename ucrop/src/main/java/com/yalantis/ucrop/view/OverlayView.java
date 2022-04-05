@@ -534,7 +534,7 @@ public class OverlayView extends View {
                 getResources().getColor(R.color.ucrop_color_default_dimmed));
         mDimmedStrokePaint.setColor(mDimmedColor);
         mDimmedStrokePaint.setStyle(Paint.Style.STROKE);
-        mDimmedStrokePaint.setStrokeWidth(1);
+        mDimmedStrokePaint.setStrokeWidth(0);
 
         initCropFrameStyle(a);
         mShowCropFrame = a.getBoolean(R.styleable.ucrop_UCropView_ucrop_show_frame, DEFAULT_SHOW_CROP_FRAME);

@@ -51,6 +51,7 @@ public class CropImageView extends TransformImageView {
     private Runnable mWrapCropBoundsRunnable, mZoomImageToPositionRunnable = null;
 
     private float mMaxScale, mMinScale;
+    private float mMinApplicableScale;
     private int mMaxResultImageSizeX = 0, mMaxResultImageSizeY = 0;
     private long mImageToWrapCropBoundsAnimDuration = DEFAULT_IMAGE_TO_CROP_BOUNDS_ANIM_DURATION;
 
@@ -243,6 +244,12 @@ public class CropImageView extends TransformImageView {
             super.postScale(deltaScale, px, py);
         } else if (deltaScale < 1 && getCurrentScale() * deltaScale >= getMinScale()) {
             super.postScale(deltaScale, px, py);
+        }
+    }
+
+    public void postScaleEnd() {
+        if (getCurrentScale() < mMinApplicableScale) {
+            postScale(mMinApplicableScale / getCurrentScale() , mCropRect.centerX(), mCropRect.centerY());
         }
     }
 
@@ -468,7 +475,8 @@ public class CropImageView extends TransformImageView {
         float widthScale = Math.min(mCropRect.width() / drawableWidth, mCropRect.width() / drawableHeight);
         float heightScale = Math.min(mCropRect.height() / drawableHeight, mCropRect.height() / drawableWidth);
 
-        mMinScale = Math.min(widthScale, heightScale);
+        mMinApplicableScale = Math.min(widthScale, heightScale);
+        mMinScale = mMinApplicableScale / 2;
         mMaxScale = mMinScale * mMaxScaleMultiplier;
     }
 
